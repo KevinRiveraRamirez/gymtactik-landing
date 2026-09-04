@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="GymTactik — Sistema de administración de gimnasios. Miembros, pagos, asistencia, analítica y reportes en un solo lugar."/>
+  <title>GymTactik — Gestiona tu gimnasio. Hazlo crecer.</title>
+  <link rel="icon" type="image/png" href="gymtactik-isotipo-transparente.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background: #ffffff; color: #071A44; line-height: 1.6; overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+    :root {
+      --navy: #071A44; --blue: #155EEF; --blue-br: #2563FF;
+      --bg-soft: #F3F7FF; --white: #FFFFFF; --text2: #52617A;
+      --green: #08A36A; --wa: #25D366; --border: #DDE6F4; --max-w: 1200px; --r-card: 18px;
+    }
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+    section { padding: 96px 0; }
+    .label {
+      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+      color: var(--blue); background: #EBF1FE; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.15; color: var(--navy); margin-bottom: 16px; }
+    .section-desc { font-size: 17px; color: var(--text2); max-width: 520px; line-height: 1.7; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; border-radius: 12px;
+      font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; border: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 6px 24px rgba(21,94,239,0.3); }
+    .btn-primary:hover { box-shadow: 0 10px 32px rgba(21,94,239,0.4); }
+    .btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--border); }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-white { background: #fff; color: var(--navy); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .check-list li { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text2); }
+    .check-list li::before {
+      content: ''; width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+      background: #E6F9F2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2308A36A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center/13px no-repeat;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+      height: 68px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo img { height: 34px; }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { font-size: 14px; font-weight: 600; color: var(--text2); transition: color 0.15s; }
+    .nav-links a:hover { color: var(--navy); }
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; }
+    .mobile-menu {
+      display: none; position: fixed; top: 68px; left: 0; right: 0;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 20px 24px; flex-direction: column; gap: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 15px; font-weight: 600; color: var(--navy); padding: 8px 0; }
+
+    /* HERO */
+    .hero {
+      padding-top: 120px; padding-bottom: 0;
+      background: linear-gradient(160deg, #EFF4FF 0%, #F8FAFF 50%, #FFFFFF 100%); overflow: hidden;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 48px;
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+    }
+    .hero-content { padding-bottom: 64px; }
+    .hero-title { font-size: clamp(36px, 5vw, 58px); font-weight: 800; line-height: 1.1; color: var(--navy); margin-bottom: 20px; }
+    .hero-title .accent { color: var(--blue); }
+    .hero-desc { font-size: 18px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; max-width: 420px; }
+    .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-img { position: relative; align-self: flex-end; }
+    .hero-img img { width: 100%; border-radius: 16px 16px 0 0; box-shadow: 0 32px 80px rgba(7,26,68,0.18); }
+
+    /* SOCIAL PROOF */
+    .social-proof { padding: 40px 0 0; background: #fff; }
+    .social-strip {
+      display: flex; align-items: center; justify-content: center; gap: 48px;
+      border: 1px solid var(--border); border-radius: 20px; padding: 28px 48px;
+      background: #fff; box-shadow: 0 4px 24px rgba(7,26,68,0.06); flex-wrap: wrap;
+    }
+    .social-item { display: flex; align-items: center; gap: 14px; }
+    .social-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .social-icon.green { background: #E6F9F2; }
+    .social-icon.blue  { background: #EBF1FE; }
+    .social-label { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: 0.8px; }
+    .social-value { font-size: 18px; font-weight: 800; color: var(--navy); }
+    .social-divider { width: 1px; height: 48px; background: var(--border); }
+
+    /* FEATURES */
+    .features { background: var(--bg-soft); }
+    .features-title { font-size: clamp(26px, 3.5vw, 38px); font-weight: 800; color: var(--navy); max-width: 520px; margin-bottom: 48px; line-height: 1.2; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feature-card {
+      background: #fff; border: 1px solid var(--border); border-radius: var(--r-card); padding: 28px 24px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover { box-shadow: 0 12px 40px rgba(21,94,239,0.1); transform: translateY(-3px); }
+    .feature-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
+    .feature-card h3 { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .feature-card p  { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+    /* FEATURE SECTIONS */
+    .feature-section { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; }
+    .feature-section.reverse { direction: rtl; }
+    .feature-section.reverse > * { direction: ltr; }
+    .feature-content { display: flex; flex-direction: column; gap: 20px; }
+    .feature-img-wrap { border-radius: 20px; overflow: hidden; box-shadow: 0 24px 64px rgba(7,26,68,0.12); background: var(--bg-soft); }
+    .feature-img-wrap img { width: 100%; object-fit: contain; }
+
+    /* WHATSAPP */
+    .wa-section { background: var(--bg-soft); }
+    .wa-inner { display: grid; grid-template-columns: 360px 1fr; align-items: center; gap: 64px; }
+    .wa-phone { background: #fff; border-radius: 32px; padding: 28px 20px; box-shadow: 0 24px 64px rgba(7,26,68,0.12); border: 1px solid var(--border); }
+    .wa-header { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+    .wa-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), #818cf8); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .wa-contact-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .wa-contact-sub  { font-size: 11px; color: var(--wa); font-weight: 600; }
+    .wa-bubble { background: #e9f9e9; border-radius: 16px 16px 16px 4px; padding: 14px 16px; font-size: 13px; color: #1a1a1a; line-height: 1.6; margin-bottom: 10px; }
+    .wa-bubble strong { color: var(--navy); }
+    .wa-cta-btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--wa); color: #fff; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; margin-top: 6px; }
+    .wa-time { text-align: right; font-size: 10px; color: #94a3b8; margin-top: 6px; }
+
+    /* CTA FINAL */
+    .cta-final { background: linear-gradient(135deg, var(--navy) 0%, #0f2d6e 100%); padding: 96px 0; }
+    .cta-final-inner { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+    .cta-final h2 { font-size: clamp(26px, 3.5vw, 40px); font-weight: 800; color: #fff; max-width: 480px; line-height: 1.2; }
+    .cta-final p { color: rgba(255,255,255,0.65); font-size: 15px; margin-top: 10px; }
+    .cta-final-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    .no-card { font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px; }
+
+    /* CONTACT */
+    .contact { background: var(--bg-soft); }
+    .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .contact-form { background: #fff; border: 1px solid var(--border); border-radius: 24px; padding: 36px; box-shadow: 0 8px 40px rgba(7,26,68,0.07); }
+    .contact-form h3 { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: var(--navy); background: var(--bg-soft); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(21,94,239,0.1); background: #fff; }
+    .form-group textarea { height: 100px; resize: vertical; }
+    .form-success { display: none; background: #E6F9F2; border: 1px solid #86efac; border-radius: 12px; padding: 16px; text-align: center; color: var(--green); font-weight: 700; font-size: 15px; }
+    .form-success.show { display: block; }
+
+    /* FOOTER */
+    footer { background: var(--navy); padding: 48px 0; }
+    .footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .footer-logo img { height: 28px; filter: brightness(0) invert(1); opacity: 0.9; }
+    .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 6px; }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+    .footer-links a:hover { color: #fff; }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1023px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .feature-section, .feature-section.reverse { grid-template-columns: 1fr; direction: ltr; }
+      .wa-inner { grid-template-columns: 1fr; }
+      .wa-phone { max-width: 360px; margin: 0 auto; }
+      .contact-inner { grid-template-columns: 1fr; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-content { padding-bottom: 0; }
+      .hero-img { display: none; }
+    }
+    @media (max-width: 767px) {
+      section { padding: 64px 0; }
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .social-strip { flex-direction: column; gap: 24px; padding: 24px; }
+      .social-divider { width: 100%; height: 1px; }
+      .cta-final-inner { flex-direction: column; text-align: center; }
+      .cta-final-right { align-items: center; }
+      .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+      .hero-buttons { flex-direction: column; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .contact-form { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="gymtactik-logo-original-transparente.png" alt="GymTactik"/>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#funciones">Funciones</a></li>
+        <li><a href="#analitica">Analítica</a></li>
+        <li><a href="#reportes">Reportes</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#contacto" class="btn btn-primary" style="padding:10px 20px;font-size:14px;">Solicitar demo</a>
+      </div>
+      <button class="hamburger" onclick="toggleMenu()" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#funciones" onclick="toggleMenu()">Funciones</a>
+    <a href="#analitica" onclick="toggleMenu()">Analítica</a>
+    <a href="#reportes" onclick="toggleMenu()">Reportes</a>
+    <a href="#contacto" onclick="toggleMenu()">Contacto</a>
+    <a href="#contacto" class="btn btn-primary" onclick="toggleMenu()" style="text-align:center;">Solicitar demo</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Gestiona tu gimnasio.<br/>
+          <span class="accent">Hazlo crecer.</span>
+        </h1>
+        <p class="hero-desc">Miembros, pagos, asistencia, analítica y reportes en un solo sistema.</p>
+        <div class="hero-buttons">
+          <a href="#contacto" class="btn btn-primary">Solicitar demostración</a>
+          <a href="#funciones" class="btn btn-outline">
+            Ver el sistema
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img src="02-dashboard.png" alt="GymTactik Dashboard"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="social-proof">
+    <div class="container">
+      <div class="social-strip">
+        <div class="social-item">
+          <div class="social-icon green">✅</div>
+          <div>
+            <div class="social-label">YA EN PRODUCCIÓN</div>
+            <div class="social-value">Activo y funcionando</div>
+          </div>
+        </div>
+        <div class="social-divider"></div>
+        <div class="social-item">
+          <div class="social-icon blue">👥</div>
+          <div>
+            <div class="social-label">MIEMBROS GESTIONADOS</div>
+            <div class="social-value">450+ miembros</div>
+          </div>
+        </div>
+        <div class="social-divider"></div>
+        <div class="social-item">
+          <div class="social-icon green">📊</div>
+          <div>
+            <div class="social-label">DISPONIBILIDAD</div>
+            <div class="social-value">24 / 7</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="funciones">
+    <div class="container">
+      <h2 class="features-title">Todo lo que tu gimnasio necesita, en un solo lugar</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#EBF1FE;">👥</div>
+          <h3>Control de miembros</h3>
+          <p>Registra, organiza y mantén siempre actualizada la información de tus miembros.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#E6F9F2;">📋</div>
+          <h3>Asistencia rápida</h3>
+          <p>Registra entradas en segundos desde cualquier dispositivo. Sin filas, sin complicaciones.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#EBF1FE;">💳</div>
+          <h3>Pagos organizados</h3>
+          <p>Controla cobros, métodos de pago y vencimientos. Todo al día y sin pérdidas.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#EBF1FE;">📊</div>
+          <h3>Analítica en tiempo real</h3>
+          <p>Visualiza métricas clave de tu gimnasio al instante y toma mejores decisiones.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#E6F9F2;">💬</div>
+          <h3>Avisos por WhatsApp</h3>
+          <p>Envía recordatorios automáticos de vencimiento y mantén a tus miembros siempre informados.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#EBF1FE;">📄</div>
+          <h3>Reportes profesionales</h3>
+          <p>Genera reportes claros, completos y listos para compartir o imprimir en un clic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANALÍTICA -->
+  <section id="analitica">
+    <div class="container">
+      <div class="feature-section">
+        <div class="feature-content">
+          <span class="label">ANALÍTICA EN TIEMPO REAL</span>
+          <h2 class="section-title">Datos que te ayudan a crecer</h2>
+          <p class="section-desc">Monitorea el rendimiento de tu gimnasio con paneles intuitivos, gráficos claros y métricas actualizadas al instante.</p>
+          <ul class="check-list">
+            <li>Membresías activas e inactivas</li>
+            <li>Ingresos y asistencia por períodos</li>
+            <li>Distribución de membresías</li>
+            <li>Comparativas y variaciones</li>
+          </ul>
+          <div><a href="#contacto" class="btn btn-primary">Ver analítica completa</a></div>
+        </div>
+        <div class="feature-img-wrap">
+          <img src="03-analitica.png" alt="Analítica GymTactik"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHATSAPP -->
+  <section class="wa-section">
+    <div class="container">
+      <div class="wa-inner">
+        <div class="wa-phone">
+          <div class="wa-header">
+            <div class="wa-avatar">💪</div>
+            <div>
+              <div class="wa-contact-name">GymTactik</div>
+              <div class="wa-contact-sub">● En línea</div>
+            </div>
+          </div>
+          <div class="wa-bubble">
+            <strong>Hola María! 👋</strong><br/><br/>
+            Tu membresía <strong>Mensual</strong> vence en <strong>2 días</strong>.<br/><br/>
+            Renovarla es muy fácil — acércate al gimnasio para seguir disfrutando todos los beneficios.
+            <div class="wa-time">10:30 a. m. ✓✓</div>
+          </div>
+          <button class="wa-cta-btn">Renovar ahora</button>
+        </div>
+        <div class="feature-content">
+          <span class="label">AVISOS AUTOMÁTICOS</span>
+          <h2 class="section-title">Recordatorios que sí funcionan</h2>
+          <p class="section-desc">Envía avisos personalizados por WhatsApp antes del vencimiento. Menos morosidad, más retención.</p>
+          <ul class="check-list">
+            <li>Avisos 1–3 días antes del vencimiento</li>
+            <li>Mensajes automáticos y personalizables</li>
+            <li>Mejora la experiencia de tus miembros</li>
+          </ul>
+          <div><a href="#contacto" class="btn btn-primary">Configurar avisos</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORTES -->
+  <section id="reportes">
+    <div class="container">
+      <div class="feature-section reverse">
+        <div class="feature-content">
+          <span class="label">REPORTES PROFESIONALES</span>
+          <h2 class="section-title">Reportes claros. Decisiones rápidas.</h2>
+          <p class="section-desc">Exporta y comparte reportes profesionales que te dan control total de tu negocio.</p>
+          <ul class="check-list">
+            <li>Reportes de ingresos, pagos y asistencia</li>
+            <li>Filtros por fechas, métodos y planes</li>
+            <li>Exporta a PDF en un clic</li>
+          </ul>
+          <div><a href="#contacto" class="btn btn-primary">Ver reportes</a></div>
+        </div>
+        <div class="feature-img-wrap">
+          <img src="05-reportes.png" alt="Reportes GymTactik"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-final">
+    <div class="cta-final-inner">
+      <div>
+        <h2>Lleva el control de tu gimnasio al siguiente nivel</h2>
+        <p>Únete a la tecnología que ya gestiona más de 450 miembros con GymTactik.</p>
+      </div>
+      <div class="cta-final-right">
+        <a href="#contacto" class="btn btn-white">Solicitar demostración →</a>
+        <span class="no-card">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Sin tarjeta de crédito. Sin compromiso.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="contact" id="contacto">
+    <div class="container">
+      <div class="contact-inner">
+        <div>
+          <h2 class="section-title">¿Listo para empezar?</h2>
+          <p class="section-desc" style="margin-bottom:32px;">Cuéntanos sobre tu gimnasio y te mostramos cómo GymTactik puede transformar tu operación.</p>
+          <ul class="check-list">
+            <li>Demo personalizada sin costo</li>
+            <li>Configuración incluida</li>
+            <li>Soporte directo con el equipo</li>
+            <li>Respuesta en menos de 24 horas</li>
+          </ul>
+          <div style="margin-top:32px; padding:24px; background:#fff; border:1px solid var(--border); border-radius:16px;">
+            <div style="font-size:13px; font-weight:700; color:var(--text2); margin-bottom:8px;">DESARROLLADO POR</div>
+            <div style="font-size:16px; font-weight:800; color:var(--navy);">KI Technologies</div>
+            <div style="font-size:13px; color:var(--text2); margin-top:4px;">Costa Rica 🇨🇷</div>
+          </div>
+        </div>
+        <div class="contact-form">
+          <h3>Solicitar demostración</h3>
+          <div id="formSuccess" class="form-success">
+            ¡Gracias! Recibimos tu solicitud y pronto nos pondremos en contacto. 🎉
+          </div>
+          <form id="contactForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+              <label>NOMBRE COMPLETO</label>
+              <input type="text" placeholder="Juan Pérez" required/>
+            </div>
+            <div class="form-group">
+              <label>NOMBRE DEL GIMNASIO</label>
+              <input type="text" placeholder="Gym Vida y Salud" required/>
+            </div>
+            <div class="form-group">
+              <label>TELÉFONO O WHATSAPP</label>
+              <input type="tel" placeholder="8888-0000" required/>
+            </div>
+            <div class="form-group">
+              <label>CORREO ELECTRÓNICO</label>
+              <input type="email" placeholder="admin@tugimnasio.com" required/>
+            </div>
+            <div class="form-group">
+              <label>MENSAJE (OPCIONAL)</label>
+              <textarea placeholder="Cuéntanos sobre tu gimnasio..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
+              Solicitar demostración
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">
+          <img src="gymtactik-logo-original-transparente.png" alt="GymTactik"/>
+        </div>
+        <div class="footer-tagline">Gestiona. Analiza. Crece.</div>
+      </div>
+      <ul class="footer-links">
+        <li><a href="#funciones">Funciones</a></li>
+        <li><a href="#analitica">Analítica</a></li>
+        <li><a href="#reportes">Reportes</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <div class="footer-copy">© 2026 GymTactik · KI Technologies</div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+    window.addEventListener('scroll', () => {
+      document.querySelector('nav').style.boxShadow = window.scrollY > 10 ? '0 4px 24px rgba(7,26,68,0.08)' : 'none';
+    });
+    function handleSubmit(e) {
+      e.preventDefault();
+      const inputs = e.target.querySelectorAll('input, textarea');
+      const nombre = inputs[0].value, gimnasio = inputs[1].value;
+      const telefono = inputs[2].value, correo = inputs[3].value, mensaje = inputs[4].value;
+      const text = encodeURIComponent(
+        `Hola! Solicito una demo de GymTactik.\n\nNombre: ${nombre}\nGimnasio: ${gimnasio}\nTeléfono: ${telefono}\nCorreo: ${correo}` +
+        (mensaje ? `\nMensaje: ${mensaje}` : '')
+      );
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('formSuccess').classList.add('show');
+      setTimeout(() => window.open(`https://wa.me/50664218397?text=${text}`, '_blank'), 800);
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.feature-card, .feature-section, .wa-inner, .contact-inner').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
