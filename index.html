@@ -504,7 +504,9 @@
 
   <script>
     function toggleMenu() {
-      document.getElementById('mobileMenu').classList.toggle('open');
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('open');
+      document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
     }
     window.addEventListener('scroll', () => {
       document.querySelector('nav').style.boxShadow = window.scrollY > 10 ? '0 4px 24px rgba(7,26,68,0.08)' : 'none';
